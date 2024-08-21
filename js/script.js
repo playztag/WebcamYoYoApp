@@ -1,7 +1,5 @@
 let player;
 let isMirrored = false;
-let isDragging = false;
-let startX, startY, startLeft, startTop;
 let isFullscreen = false;
 
 function onYouTubeIframeAPIReady() {
@@ -18,71 +16,8 @@ function onYouTubeIframeAPIReady() {
 
 function onPlayerReady(event) {
     console.log('YouTube player is ready');
-    setupWebcamDragging();
     initializeWebcam();
-}
-
-function setupWebcamDragging() {
-    const webcamFeed = document.getElementById('webcam-feed');
-    
-    webcamFeed.addEventListener('mousedown', startDragging);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', stopDragging);
-    
-    // Touch events for mobile devices
-    webcamFeed.addEventListener('touchstart', startDragging);
-    document.addEventListener('touchmove', drag);
-    document.addEventListener('touchend', stopDragging);
-}
-
-function startDragging(e) {
-    isDragging = true;
-    const webcamFeed = document.getElementById('webcam-feed');
-    
-    if (e.type === 'touchstart') {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-    } else {
-        startX = e.clientX;
-        startY = e.clientY;
-    }
-    
-    startLeft = parseInt(webcamFeed.style.left) || 0;
-    startTop = parseInt(webcamFeed.style.top) || 0;
-    
-    e.preventDefault();
-}
-
-function drag(e) {
-    if (!isDragging) return;
-    
-    const webcamFeed = document.getElementById('webcam-feed');
-    const videoContainer = document.querySelector('.video-container');
-    let clientX, clientY;
-    
-    if (e.type === 'touchmove') {
-        clientX = e.touches[0].clientX;
-        clientY = e.touches[0].clientY;
-    } else {
-        clientX = e.clientX;
-        clientY = e.clientY;
-    }
-    
-    let newLeft = startLeft + clientX - startX;
-    let newTop = startTop + clientY - startY;
-    
-    // Constrain within video container
-    newLeft = Math.max(0, Math.min(newLeft, videoContainer.offsetWidth - webcamFeed.offsetWidth));
-    newTop = Math.max(0, Math.min(newTop, videoContainer.offsetHeight - webcamFeed.offsetHeight));
-    
-    webcamFeed.style.left = newLeft + 'px';
-    webcamFeed.style.top = newTop + 'px';
-    
-    e.preventDefault();
-}
-
-function stopDragging() {
-    isDragging = false;
+    setupKeyboardControls();
 }
 
 function playVideo() {
@@ -118,13 +53,26 @@ function toggleMirror() {
     applyWebcamTransform();
 }
 
-function changePlaybackSpeed() {
+function changePlaybackSpeed(increase = true) {
     const speedSlider = document.getElementById('playback-speed');
+    let newSpeed = parseFloat(speedSlider.value);
+    if (increase) {
+        newSpeed = Math.min(newSpeed + 0.25, 2); // max speed 2x
+    } else {
+        newSpeed = Math.max(newSpeed - 0.25, 0.25); // min speed 0.25x
+    }
+    speedSlider.value = newSpeed;
     const speedValue = document.getElementById('speed-value');
-    const newSpeed = parseFloat(speedSlider.value);
     if (player && player.setPlaybackRate) {
         player.setPlaybackRate(newSpeed);
         speedValue.textContent = newSpeed + 'x';
+    }
+}
+
+function advanceFrame(forward = true) {
+    if (player && player.getCurrentTime) {
+        const currentTime = player.getCurrentTime();
+        player.seekTo(forward ? currentTime + 1 / 30 : currentTime - 1 / 30);
     }
 }
 
@@ -176,10 +124,6 @@ function initializeWebcam() {
             const opacityValue = document.getElementById('opacity-value');
             videoElement.style.opacity = opacityControl.value;
             opacityValue.textContent = Math.round(opacityControl.value * 100) + '%';
-
-            // Set initial position
-            videoElement.style.left = '10px';
-            videoElement.style.top = '10px';
         })
         .catch(error => console.error('Error accessing webcam:', error));
 }
@@ -217,6 +161,35 @@ function toggleFullscreen() {
     setTimeout(() => {
         player.setSize(videoContainer.offsetWidth, videoContainer.offsetHeight);
     }, 100);
+}
+
+// Set up keyboard controls
+function setupKeyboardControls() {
+    document.addEventListener('keydown', function(event) {
+        switch (event.key) {
+            case ' ': // Spacebar for play/pause
+                if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    pauseVideo();
+                } else {
+                    playVideo();
+                }
+                break;
+            case 'ArrowUp': // Arrow Up to increase speed
+                changePlaybackSpeed(true);
+                break;
+            case 'ArrowDown': // Arrow Down to decrease speed
+                changePlaybackSpeed(false);
+                break;
+            case 'ArrowRight': // Arrow Right to advance frame by frame
+                advanceFrame(true);
+                break;
+            case 'ArrowLeft': // Arrow Left to reverse frame by frame
+                advanceFrame(false);
+                break;
+            default:
+                break;
+        }
+    });
 }
 
 // Add event listeners
