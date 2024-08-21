@@ -39,6 +39,8 @@ body {
     object-fit: cover;
     border: 2px solid #333;
     border-radius: 5px;
+    cursor: move;
+    z-index: 10;
 }
 
 .controls {
@@ -78,7 +80,7 @@ input[type="range"] {
     width: 200px;
 }
 
-#speed-value {
+#speed-value, #opacity-value {
     margin-left: 10px;
 }
 
