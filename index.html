@@ -23,8 +23,16 @@
             <div class="webcam-controls">
                 <button onclick="toggleMirror()">Mirror Webcam</button>
                 <label for="opacity-control">Opacity:</label>
-                <input type="range" id="opacity-control" min="0" max="1" step="0.1" value="1" onchange="changeOpacity()">
-                <span id="opacity-value">100%</span>
+                <input type="range" id="opacity-control" min="0" max="1" step="0.1" value="0.5" onchange="changeOpacity()">
+                <span id="opacity-value">50%</span>
+            </div>
+            <div class="scale-controls">
+                <label for="youtube-scale">YouTube Scale:</label>
+                <input type="range" id="youtube-scale" min="0.5" max="2" step="0.1" value="1" onchange="changeYouTubeScale()">
+                <span id="youtube-scale-value">100%</span>
+                <label for="webcam-scale">Webcam Scale:</label>
+                <input type="range" id="webcam-scale" min="0.5" max="2" step="0.1" value="1" onchange="changeWebcamScale()">
+                <span id="webcam-scale-value">100%</span>
             </div>
             <div class="playback-controls">
                 <label for="playback-speed">Playback Speed:</label>

@@ -18,6 +18,7 @@ function onYouTubeIframeAPIReady() {
 function onPlayerReady(event) {
     console.log('YouTube player is ready');
     setupWebcamDragging();
+    initializeWebcam();
 }
 
 function setupWebcamDragging() {
@@ -137,19 +138,43 @@ function changeOpacity() {
     opacityValue.textContent = Math.round(newOpacity * 100) + '%';
 }
 
-// Initialize webcam
-navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => {
-        const videoElement = document.getElementById('webcam-feed');
-        videoElement.srcObject = stream;
-    })
-    .catch(error => console.error('Error accessing webcam:', error));
+function changeYouTubeScale() {
+    const youtubeScale = document.getElementById('youtube-scale');
+    const youtubeScaleValue = document.getElementById('youtube-scale-value');
+    const youtubePlayer = document.getElementById('youtube-player');
+    const newScale = parseFloat(youtubeScale.value);
+    
+    youtubePlayer.style.transform = `scale(${newScale})`;
+    youtubeScaleValue.textContent = Math.round(newScale * 100) + '%';
+}
 
-// Add event listener for playback speed changes
-document.getElementById('playback-speed').addEventListener('input', function() {
-    const speedValue = document.getElementById('speed-value');
-    speedValue.textContent = this.value + 'x';
-});
+function changeWebcamScale() {
+    const webcamScale = document.getElementById('webcam-scale');
+    const webcamScaleValue = document.getElementById('webcam-scale-value');
+    const webcamFeed = document.getElementById('webcam-feed');
+    const newScale = parseFloat(webcamScale.value);
+    
+    webcamFeed.style.transform = `scale(${newScale})${isMirrored ? ' scaleX(-1)' : ''}`;
+    webcamScaleValue.textContent = Math.round(newScale * 100) + '%';
+}
 
-// Add event listener for opacity changes
+function initializeWebcam() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            const videoElement = document.getElementById('webcam-feed');
+            videoElement.srcObject = stream;
+            
+            // Set initial opacity
+            const opacityControl = document.getElementById('opacity-control');
+            const opacityValue = document.getElementById('opacity-value');
+            videoElement.style.opacity = opacityControl.value;
+            opacityValue.textContent = Math.round(opacityControl.value * 100) + '%';
+        })
+        .catch(error => console.error('Error accessing webcam:', error));
+}
+
+// Add event listeners
+document.getElementById('playback-speed').addEventListener('input', changePlaybackSpeed);
 document.getElementById('opacity-control').addEventListener('input', changeOpacity);
+document.getElementById('youtube-scale').addEventListener('input', changeYouTubeScale);
+document.getElementById('webcam-scale').addEventListener('input', changeWebcamScale);
