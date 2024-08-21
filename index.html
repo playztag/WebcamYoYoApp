@@ -8,9 +8,13 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="video-container">
-            <div id="youtube-player"></div>
-            <video id="webcam-feed" autoplay></video>
+        <div class="video-container" id="video-container">
+            <div id="youtube-player-container">
+                <div id="youtube-player"></div>
+            </div>
+            <div id="webcam-container">
+                <video id="webcam-feed" autoplay></video>
+            </div>
         </div>
         <div class="controls">
             <div class="video-controls">
@@ -19,6 +23,7 @@
                 <button onclick="stopVideo()">Stop</button>
                 <input type="text" id="video-id-input" placeholder="Enter YouTube Video ID">
                 <button onclick="loadNewVideo()">Load Video</button>
+                <button onclick="toggleFullscreen()">Fullscreen</button>
             </div>
             <div class="webcam-controls">
                 <button onclick="toggleMirror()">Mirror Webcam</button>

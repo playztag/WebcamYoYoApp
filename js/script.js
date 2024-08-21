@@ -2,11 +2,12 @@ let player;
 let isMirrored = false;
 let isDragging = false;
 let startX, startY, startLeft, startTop;
+let isFullscreen = false;
 
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('youtube-player', {
-        height: '360',
-        width: '640',
+        height: '720',
+        width: '1280',
         videoId: 'dQw4w9WgXcQ', // Example video ID
         playerVars: {'autoplay': 0, 'controls': 1},
         events: {
@@ -46,8 +47,8 @@ function startDragging(e) {
         startY = e.clientY;
     }
     
-    startLeft = parseInt(window.getComputedStyle(webcamFeed).left);
-    startTop = parseInt(window.getComputedStyle(webcamFeed).top);
+    startLeft = parseInt(webcamFeed.style.left) || 0;
+    startTop = parseInt(webcamFeed.style.top) || 0;
     
     e.preventDefault();
 }
@@ -113,9 +114,8 @@ function loadNewVideo() {
 }
 
 function toggleMirror() {
-    const webcamFeed = document.getElementById('webcam-feed');
     isMirrored = !isMirrored;
-    webcamFeed.style.transform = isMirrored ? 'scaleX(-1)' : 'scaleX(1)';
+    applyWebcamTransform();
 }
 
 function changePlaybackSpeed() {
@@ -151,11 +151,18 @@ function changeYouTubeScale() {
 function changeWebcamScale() {
     const webcamScale = document.getElementById('webcam-scale');
     const webcamScaleValue = document.getElementById('webcam-scale-value');
+    const newScale = parseFloat(webcamScale.value);
+    
+    webcamScaleValue.textContent = Math.round(newScale * 100) + '%';
+    applyWebcamTransform();
+}
+
+function applyWebcamTransform() {
     const webcamFeed = document.getElementById('webcam-feed');
+    const webcamScale = document.getElementById('webcam-scale');
     const newScale = parseFloat(webcamScale.value);
     
     webcamFeed.style.transform = `scale(${newScale})${isMirrored ? ' scaleX(-1)' : ''}`;
-    webcamScaleValue.textContent = Math.round(newScale * 100) + '%';
 }
 
 function initializeWebcam() {
@@ -169,8 +176,47 @@ function initializeWebcam() {
             const opacityValue = document.getElementById('opacity-value');
             videoElement.style.opacity = opacityControl.value;
             opacityValue.textContent = Math.round(opacityControl.value * 100) + '%';
+
+            // Set initial position
+            videoElement.style.left = '10px';
+            videoElement.style.top = '10px';
         })
         .catch(error => console.error('Error accessing webcam:', error));
+}
+
+function toggleFullscreen() {
+    const appContainer = document.querySelector('.app-container');
+    const videoContainer = document.getElementById('video-container');
+    
+    if (!isFullscreen) {
+        if (videoContainer.requestFullscreen) {
+            videoContainer.requestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) { // Firefox
+            videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            videoContainer.webkitRequestFullscreen();
+        } else if (videoContainer.msRequestFullscreen) { // IE/Edge
+            videoContainer.msRequestFullscreen();
+        }
+        appContainer.classList.add('fullscreen');
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+            document.msExitFullscreen();
+        }
+        appContainer.classList.remove('fullscreen');
+    }
+    
+    isFullscreen = !isFullscreen;
+    // Adjust player size for fullscreen
+    setTimeout(() => {
+        player.setSize(videoContainer.offsetWidth, videoContainer.offsetHeight);
+    }, 100);
 }
 
 // Add event listeners
@@ -178,3 +224,27 @@ document.getElementById('playback-speed').addEventListener('input', changePlayba
 document.getElementById('opacity-control').addEventListener('input', changeOpacity);
 document.getElementById('youtube-scale').addEventListener('input', changeYouTubeScale);
 document.getElementById('webcam-scale').addEventListener('input', changeWebcamScale);
+
+// Fullscreen change listener
+document.addEventListener('fullscreenchange', handleFullscreenChange);
+document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+function handleFullscreenChange() {
+    const appContainer = document.querySelector('.app-container');
+    const videoContainer = document.getElementById('video-container');
+    
+    if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+        appContainer.classList.add('fullscreen');
+        isFullscreen = true;
+    } else {
+        appContainer.classList.remove('fullscreen');
+        isFullscreen = false;
+    }
+    
+    // Adjust player size after fullscreen change
+    setTimeout(() => {
+        player.setSize(videoContainer.offsetWidth, videoContainer.offsetHeight);
+    }, 100);
+}
