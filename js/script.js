@@ -20,6 +20,14 @@ function onPlayerReady(event) {
     setupKeyboardControls();
 }
 
+function playPauseVideo() {
+    if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+        pauseVideo();
+    } else {
+        playVideo();
+    }
+}
+
 function playVideo() {
     if (player && player.playVideo) {
         player.playVideo();

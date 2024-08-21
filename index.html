@@ -15,8 +15,17 @@
             <div id="webcam-container">
                 <video id="webcam-feed" autoplay></video>
             </div>
+            <!-- New Overlay Controls -->
+            <div class="overlay-controls">
+                <button onclick="playPauseVideo()" id="play-pause-btn">Play/Pause</button>
+                <button onclick="changePlaybackSpeed(false)">- Speed</button>
+                <button onclick="changePlaybackSpeed(true)">+ Speed</button>
+                <button onclick="advanceFrame(false)"><< Frame</button>
+                <button onclick="advanceFrame(true)">Frame >></button>
+            </div>
         </div>
         <div class="controls">
+            <!-- Existing controls here -->
             <div class="video-controls">
                 <button onclick="playVideo()">Play</button>
                 <button onclick="pauseVideo()">Pause</button>
