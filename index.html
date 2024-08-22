@@ -15,13 +15,16 @@
             <div id="webcam-container">
                 <video id="webcam-feed" autoplay></video>
             </div>
-            <!-- Overlay Controls -->
+            <!-- Updated Overlay Controls -->
             <div class="overlay-controls">
-                <button onclick="playPauseVideo()" id="play-pause-btn">Play/Pause</button>
-                <button onclick="changePlaybackSpeed(false)">- Speed</button>
-                <button onclick="changePlaybackSpeed(true)">+ Speed</button>
-                <button onclick="advanceFrame(false)"><< Frame</button>
-                <button onclick="advanceFrame(true)">Frame >></button>
+                <button onclick="playPauseVideo()" id="play-pause-btn">Play/Pause (Space)</button>
+                <button onclick="changePlaybackSpeed(false)">- Speed (↓)</button>
+                <button onclick="changePlaybackSpeed(true)">+ Speed (↑)</button>
+                <button onclick="advanceFrame(false)"><< Frame (←)</button>
+                <button onclick="advanceFrame(true)">Frame >> (→)</button>
+                <button onclick="toggleWebcamMirror()" id="mirror-webcam-btn">Mirror Webcam (M)</button>
+                <button onclick="toggleYoutubeMirror()" id="mirror-youtube-btn">Mirror YouTube (Y)</button>
+                <button onclick="toggleFullscreen()">Fullscreen (F)</button>
             </div>
         </div>
         <div class="controls">
@@ -32,7 +35,6 @@
                 <input type="text" id="video-id-input" placeholder="Enter YouTube Video ID">
                 <button onclick="loadNewVideo()">Load Video</button>
                 <button onclick="toggleFullscreen()">Fullscreen</button>
-                <button onclick="toggleYoutubeMirror()">Mirror YouTube</button>
             </div>
             <div class="webcam-controls">
                 <button onclick="toggleWebcamMirror()">Mirror Webcam</button>

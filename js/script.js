@@ -1,13 +1,13 @@
 let player;
-let isWebcamMirrored = false;
-let isYoutubeMirrored = false;
+let isWebcamMirrored = true;
+let isYoutubeMirrored = true; // Set YouTube mirrored by default
 let isFullscreen = false;
 
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('youtube-player', {
         height: '720',
         width: '1280',
-        videoId: 'dQw4w9WgXcQ', // Example video ID
+        videoId: 'fmCD81mHbrc', // Example video ID
         playerVars: {'autoplay': 0, 'controls': 1},
         events: {
             'onReady': onPlayerReady
@@ -19,6 +19,8 @@ function onPlayerReady(event) {
     console.log('YouTube player is ready');
     initializeWebcam();
     setupKeyboardControls();
+    applyYoutubeTransform(); // Apply default mirroring
+    updateOverlayControls();
 }
 
 function playPauseVideo() {
@@ -27,24 +29,28 @@ function playPauseVideo() {
     } else {
         playVideo();
     }
+    updateOverlayControls();
 }
 
 function playVideo() {
     if (player && player.playVideo) {
         player.playVideo();
     }
+    updateOverlayControls();
 }
 
 function pauseVideo() {
     if (player && player.pauseVideo) {
         player.pauseVideo();
     }
+    updateOverlayControls();
 }
 
 function stopVideo() {
     if (player && player.stopVideo) {
         player.stopVideo();
     }
+    updateOverlayControls();
 }
 
 function loadNewVideo() {
@@ -60,11 +66,13 @@ function loadNewVideo() {
 function toggleWebcamMirror() {
     isWebcamMirrored = !isWebcamMirrored;
     applyWebcamTransform();
+    updateOverlayControls();
 }
 
 function toggleYoutubeMirror() {
     isYoutubeMirrored = !isYoutubeMirrored;
     applyYoutubeTransform();
+    updateOverlayControls();
 }
 
 function changePlaybackSpeed(increase = true) {
@@ -81,6 +89,7 @@ function changePlaybackSpeed(increase = true) {
         player.setPlaybackRate(newSpeed);
         speedValue.textContent = newSpeed + 'x';
     }
+    updateOverlayControls();
 }
 
 function advanceFrame(forward = true) {
@@ -98,6 +107,7 @@ function changeOpacity() {
     
     webcamFeed.style.opacity = newOpacity;
     opacityValue.textContent = Math.round(newOpacity * 100) + '%';
+    updateOverlayControls();
 }
 
 function changeYouTubeScale() {
@@ -107,6 +117,7 @@ function changeYouTubeScale() {
     
     youtubeScaleValue.textContent = Math.round(newScale * 100) + '%';
     applyYoutubeTransform();
+    updateOverlayControls();
 }
 
 function changeWebcamScale() {
@@ -116,6 +127,7 @@ function changeWebcamScale() {
     
     webcamScaleValue.textContent = Math.round(newScale * 100) + '%';
     applyWebcamTransform();
+    updateOverlayControls();
 }
 
 function applyWebcamTransform() {
@@ -145,25 +157,26 @@ function initializeWebcam() {
             const opacityValue = document.getElementById('opacity-value');
             videoElement.style.opacity = opacityControl.value;
             opacityValue.textContent = Math.round(opacityControl.value * 100) + '%';
+
+            // Apply initial webcam transform (mirrored by default)
+            applyWebcamTransform();
         })
         .catch(error => console.error('Error accessing webcam:', error));
 }
 
 function toggleFullscreen() {
     const appContainer = document.querySelector('.app-container');
-    const videoContainer = document.getElementById('video-container');
     
     if (!isFullscreen) {
-        if (videoContainer.requestFullscreen) {
-            videoContainer.requestFullscreen();
-        } else if (videoContainer.mozRequestFullScreen) { // Firefox
-            videoContainer.mozRequestFullScreen();
-        } else if (videoContainer.webkitRequestFullscreen) { // Chrome, Safari and Opera
-            videoContainer.webkitRequestFullscreen();
-        } else if (videoContainer.msRequestFullscreen) { // IE/Edge
-            videoContainer.msRequestFullscreen();
+        if (appContainer.requestFullscreen) {
+            appContainer.requestFullscreen();
+        } else if (appContainer.mozRequestFullScreen) { // Firefox
+            appContainer.mozRequestFullScreen();
+        } else if (appContainer.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            appContainer.webkitRequestFullscreen();
+        } else if (appContainer.msRequestFullscreen) { // IE/Edge
+            appContainer.msRequestFullscreen();
         }
-        appContainer.classList.add('fullscreen');
     } else {
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -174,26 +187,14 @@ function toggleFullscreen() {
         } else if (document.msExitFullscreen) { // IE/Edge
             document.msExitFullscreen();
         }
-        appContainer.classList.remove('fullscreen');
     }
-    
-    isFullscreen = !isFullscreen;
-    // Adjust player size for fullscreen
-    setTimeout(() => {
-        player.setSize(videoContainer.offsetWidth, videoContainer.offsetHeight);
-    }, 100);
 }
 
-// Set up keyboard controls
 function setupKeyboardControls() {
     document.addEventListener('keydown', function(event) {
         switch (event.key) {
             case ' ': // Spacebar for play/pause
-                if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-                    pauseVideo();
-                } else {
-                    playVideo();
-                }
+                playPauseVideo();
                 break;
             case 'ArrowUp': // Arrow Up to increase speed
                 changePlaybackSpeed(true);
@@ -207,10 +208,33 @@ function setupKeyboardControls() {
             case 'ArrowLeft': // Arrow Left to reverse frame by frame
                 advanceFrame(false);
                 break;
+            case 'm': // 'm' for mirror webcam
+                toggleWebcamMirror();
+                break;
+            case 'y': // 'y' for mirror YouTube
+                toggleYoutubeMirror();
+                break;
+            case 'f': // 'f' for fullscreen
+                toggleFullscreen();
+                break;
             default:
                 break;
         }
     });
+}
+
+function updateOverlayControls() {
+    const playPauseBtn = document.getElementById('play-pause-btn');
+    playPauseBtn.textContent = player.getPlayerState() === YT.PlayerState.PLAYING ? 'Pause (Space)' : 'Play (Space)';
+
+    const mirrorWebcamBtn = document.getElementById('mirror-webcam-btn');
+    mirrorWebcamBtn.textContent = `${isWebcamMirrored ? 'Unmirror' : 'Mirror'} Webcam (M)`;
+
+    const mirrorYoutubeBtn = document.getElementById('mirror-youtube-btn');
+    mirrorYoutubeBtn.textContent = `${isYoutubeMirrored ? 'Unmirror' : 'Mirror'} YouTube (Y)`;
+
+    const speedValue = document.getElementById('speed-value');
+    speedValue.textContent = player.getPlaybackRate() + 'x';
 }
 
 // Add event listeners
@@ -229,16 +253,18 @@ function handleFullscreenChange() {
     const appContainer = document.querySelector('.app-container');
     const videoContainer = document.getElementById('video-container');
     
-    if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+    isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    
+    if (isFullscreen) {
         appContainer.classList.add('fullscreen');
-        isFullscreen = true;
     } else {
         appContainer.classList.remove('fullscreen');
-        isFullscreen = false;
     }
     
     // Adjust player size after fullscreen change
     setTimeout(() => {
         player.setSize(videoContainer.offsetWidth, videoContainer.offsetHeight);
     }, 100);
+
+    updateOverlayControls();
 }
