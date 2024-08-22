@@ -52,7 +52,7 @@ body {
     pointer-events: none;
 }
 
-#webcam-feed {
+#webcam-feed, #output-canvas {
     position: absolute;
     top: 0;
     left: 0;
@@ -63,6 +63,10 @@ body {
     border-radius: 0;
     cursor: default;
     pointer-events: none;
+}
+
+#output-canvas {
+    display: none;
 }
 
 .controls {
@@ -189,6 +193,14 @@ label, span {
         padding: 8px 12px;
         font-size: 12px;
     }
+
+    .controls {
+        flex-direction: column;
+    }
+
+    button, input[type="text"], input[type="range"] {
+        margin: 5px 0;
+    }
 }
 
 /* Ensure fullscreen works on smaller screens */
@@ -197,4 +209,23 @@ label, span {
         width: 100vw;
         height: 100vh;
     }
+}
+
+/* Styles for background removal toggle */
+#remove-background-btn {
+    background-color: #f44336;
+}
+
+#remove-background-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Ensure the canvas for background removal is properly positioned */
+#output-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }

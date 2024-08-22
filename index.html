@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/styles.css">
     <title>Webcam Yoyo App</title>
+    <!-- Add TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    <!-- Add BodyPix -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0"></script>
 </head>
 <body>
     <div class="app-container">
@@ -14,8 +18,9 @@
             </div>
             <div id="webcam-container">
                 <video id="webcam-feed" autoplay></video>
+                <canvas id="output-canvas"></canvas>
             </div>
-            <!-- Updated Overlay Controls -->
+            <!-- Overlay Controls -->
             <div class="overlay-controls">
                 <button onclick="playPauseVideo()" id="play-pause-btn">Play/Pause (Space)</button>
                 <button onclick="changePlaybackSpeed(false)">- Speed (↓)</button>
@@ -25,6 +30,7 @@
                 <button onclick="toggleWebcamMirror()" id="mirror-webcam-btn">Mirror Webcam (M)</button>
                 <button onclick="toggleYoutubeMirror()" id="mirror-youtube-btn">Mirror YouTube (Y)</button>
                 <button onclick="toggleFullscreen()">Fullscreen (F)</button>
+                <button onclick="toggleBackgroundRemoval()" id="remove-background-btn">Remove Background</button>
             </div>
         </div>
         <div class="controls">
