@@ -1,5 +1,6 @@
 let player;
-let isMirrored = false;
+let isWebcamMirrored = false;
+let isYoutubeMirrored = false;
 let isFullscreen = false;
 
 function onYouTubeIframeAPIReady() {
@@ -56,9 +57,14 @@ function loadNewVideo() {
     }
 }
 
-function toggleMirror() {
-    isMirrored = !isMirrored;
+function toggleWebcamMirror() {
+    isWebcamMirrored = !isWebcamMirrored;
     applyWebcamTransform();
+}
+
+function toggleYoutubeMirror() {
+    isYoutubeMirrored = !isYoutubeMirrored;
+    applyYoutubeTransform();
 }
 
 function changePlaybackSpeed(increase = true) {
@@ -97,11 +103,10 @@ function changeOpacity() {
 function changeYouTubeScale() {
     const youtubeScale = document.getElementById('youtube-scale');
     const youtubeScaleValue = document.getElementById('youtube-scale-value');
-    const youtubePlayer = document.getElementById('youtube-player');
     const newScale = parseFloat(youtubeScale.value);
     
-    youtubePlayer.style.transform = `scale(${newScale})`;
     youtubeScaleValue.textContent = Math.round(newScale * 100) + '%';
+    applyYoutubeTransform();
 }
 
 function changeWebcamScale() {
@@ -118,7 +123,15 @@ function applyWebcamTransform() {
     const webcamScale = document.getElementById('webcam-scale');
     const newScale = parseFloat(webcamScale.value);
     
-    webcamFeed.style.transform = `scale(${newScale})${isMirrored ? ' scaleX(-1)' : ''}`;
+    webcamFeed.style.transform = `scale(${newScale})${isWebcamMirrored ? ' scaleX(-1)' : ''}`;
+}
+
+function applyYoutubeTransform() {
+    const youtubePlayer = document.getElementById('youtube-player');
+    const youtubeScale = document.getElementById('youtube-scale');
+    const newScale = parseFloat(youtubeScale.value);
+    
+    youtubePlayer.style.transform = `scale(${newScale})${isYoutubeMirrored ? ' scaleX(-1)' : ''}`;
 }
 
 function initializeWebcam() {

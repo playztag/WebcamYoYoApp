@@ -15,7 +15,7 @@
             <div id="webcam-container">
                 <video id="webcam-feed" autoplay></video>
             </div>
-            <!-- New Overlay Controls -->
+            <!-- Overlay Controls -->
             <div class="overlay-controls">
                 <button onclick="playPauseVideo()" id="play-pause-btn">Play/Pause</button>
                 <button onclick="changePlaybackSpeed(false)">- Speed</button>
@@ -25,7 +25,6 @@
             </div>
         </div>
         <div class="controls">
-            <!-- Existing controls here -->
             <div class="video-controls">
                 <button onclick="playVideo()">Play</button>
                 <button onclick="pauseVideo()">Pause</button>
@@ -33,9 +32,10 @@
                 <input type="text" id="video-id-input" placeholder="Enter YouTube Video ID">
                 <button onclick="loadNewVideo()">Load Video</button>
                 <button onclick="toggleFullscreen()">Fullscreen</button>
+                <button onclick="toggleYoutubeMirror()">Mirror YouTube</button>
             </div>
             <div class="webcam-controls">
-                <button onclick="toggleMirror()">Mirror Webcam</button>
+                <button onclick="toggleWebcamMirror()">Mirror Webcam</button>
                 <label for="opacity-control">Opacity:</label>
                 <input type="range" id="opacity-control" min="0" max="1" step="0.1" value="0.5" onchange="changeOpacity()">
                 <span id="opacity-value">50%</span>
